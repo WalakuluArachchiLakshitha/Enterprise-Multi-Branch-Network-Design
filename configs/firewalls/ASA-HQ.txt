@@ -1,0 +1,114 @@
+ASA-HQ#sh run
+ASA Version 9.6(1)
+!
+hostname ASA-HQ
+names
+!
+interface GigabitEthernet1/1
+ nameif outside
+ security-level 0
+ ip address 192.168.2.1 255.255.255.252
+!
+interface GigabitEthernet1/2
+ nameif inside
+ security-level 100
+ ip address 192.168.1.1 255.255.255.0
+!
+interface GigabitEthernet1/3
+ nameif dmz
+ security-level 50
+ ip address 10.10.70.1 255.255.255.0
+!
+interface GigabitEthernet1/4
+ no nameif
+ no security-level
+ no ip address
+ shutdown
+!
+interface GigabitEthernet1/5
+ no nameif
+ no security-level
+ no ip address
+ shutdown
+!
+interface GigabitEthernet1/6
+ no nameif
+ no security-level
+ no ip address
+ shutdown
+!
+interface GigabitEthernet1/7
+ no nameif
+ no security-level
+ no ip address
+ shutdown
+!
+interface GigabitEthernet1/8
+ no nameif
+ no security-level
+ no ip address
+ shutdown
+!
+interface Management1/1
+ management-only
+ no nameif
+ no security-level
+ no ip address
+ shutdown
+!
+!
+route inside 10.10.0.0 255.255.0.0 192.168.1.2 1
+route outside 0.0.0.0 0.0.0.0 192.168.2.2 1
+!
+access-list OUTSIDE-IN extended permit icmp host 192.168.2.2 host 192.168.1.2 echo-reply
+access-list OUTSIDE-IN extended permit icmp host 192.168.2.2 host 192.168.1.2 echo
+access-list OUTSIDE-IN extended permit icmp host 192.168.2.2 10.10.0.0 255.255.0.0 echo
+access-list OUTSIDE-IN extended permit icmp host 192.168.2.2 10.10.0.0 255.255.0.0 echo-reply
+access-list OUTSIDE-IN extended permit icmp 10.20.0.0 255.255.0.0 10.10.0.0 255.255.0.0
+access-list OUTSIDE-IN extended permit icmp 10.30.0.0 255.255.0.0 10.10.0.0 255.255.0.0
+access-list OUTSIDE-IN extended permit udp 10.20.0.0 255.255.0.0 host 10.10.60.10 eq bootps
+access-list OUTSIDE-IN extended permit udp 10.30.0.0 255.255.0.0 host 10.10.60.10 eq bootps
+access-list OUTSIDE-IN extended permit udp 10.20.0.0 255.255.0.0 host 10.10.60.11 eq domain
+access-list OUTSIDE-IN extended permit udp 10.30.0.0 255.255.0.0 host 10.10.60.11 eq domain
+access-list OUTSIDE-IN extended permit tcp 10.20.0.0 255.255.0.0 host 10.10.60.12 eq www
+access-list OUTSIDE-IN extended permit tcp 10.30.0.0 255.255.0.0 host 10.10.60.12 eq www
+access-list OUTSIDE-IN extended permit tcp 10.20.0.0 255.255.0.0 host 10.10.60.13 eq ftp
+access-list OUTSIDE-IN extended permit tcp 10.30.0.0 255.255.0.0 host 10.10.60.13 eq ftp
+access-list OUTSIDE-IN extended permit tcp 10.20.0.0 255.255.0.0 host 10.10.60.14 eq smtp
+access-list OUTSIDE-IN extended permit tcp 10.30.0.0 255.255.0.0 host 10.10.60.14 eq smtp
+access-list OUTSIDE-IN extended permit tcp 10.20.0.0 255.255.0.0 host 10.10.60.14 eq pop3
+access-list OUTSIDE-IN extended permit tcp 10.30.0.0 255.255.0.0 host 10.10.60.14 eq pop3
+access-list OUTSIDE-IN extended permit tcp 10.20.0.0 255.255.0.0 host 10.10.60.12 eq 443
+access-list OUTSIDE-IN extended permit tcp 10.30.0.0 255.255.0.0 host 10.10.60.12 eq 443
+access-list DMZ-IN extended permit tcp host 10.10.70.10 eq www 10.10.0.0 255.255.0.0
+access-list DMZ-IN extended permit tcp host 10.10.70.10 eq 443 10.10.0.0 255.255.0.0
+access-list DMZ-IN extended permit icmp host 10.10.70.10 10.10.0.0 255.255.0.0 echo-reply
+access-list DMZ-IN extended deny ip any any
+!
+!
+access-group OUTSIDE-IN in interface outside
+access-group DMZ-IN in interface dmz
+!
+!
+class-map inspection_default
+ match default-inspection-traffic
+!
+policy-map type inspect dns preset_dns_map
+ parameters
+  message-length maximum 512
+policy-map global_policy
+ class inspection_default
+  inspect dns preset_dns_map
+  inspect ftp 
+  inspect icmp 
+  inspect tftp 
+!
+service-policy global_policy global
+!
+telnet timeout 5
+ssh timeout 5
+!
+!
+!
+!
+ASA-HQ# 
