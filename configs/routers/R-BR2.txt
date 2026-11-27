@@ -1,0 +1,141 @@
+R-BR2#sh run
+Building configuration...
+
+Current configuration : 2053 bytes
+!
+version 15.1
+no service timestamps log datetime msec
+no service timestamps debug datetime msec
+service password-encryption
+!
+hostname R-BR2
+!
+!
+!
+enable secret 5 $1$mERr$UD1uvekWLZuJYbrk3Hord0
+!
+!
+!
+!
+!
+!
+no ip cef
+no ipv6 cef
+!
+!
+!
+username admin secret 5 $1$mERr$UD1uvekWLZuJYbrk3Hord0
+!
+!
+license udi pid CISCO2911/K9 sn FTX15242177-
+license boot module c2900 technology-package securityk9
+!
+!
+!
+crypto isakmp policy 10
+ encr aes 256
+ authentication pre-share
+ group 2
+!
+crypto isakmp key ProjectVPN2026 address 172.16.0.1
+!
+!
+crypto ipsec security-association lifetime seconds 86400
+!
+crypto ipsec transform-set TS-VPN esp-aes 256 esp-sha-hmac
+!
+crypto map VPN-MAP 10 ipsec-isakmp 
+ set peer 172.16.0.1
+ set security-association lifetime seconds 86400
+ set transform-set TS-VPN 
+ match address VPN-HQ
+!
+!
+!
+!
+!
+!
+ip ssh version 2
+no ip domain-lookup
+ip domain-name corp.com
+!
+!
+spanning-tree mode pvst
+!
+!
+!
+!
+!
+!
+interface GigabitEthernet0/0
+ description To-ASA-BR2-Outside
+ ip address 10.30.200.1 255.255.255.252
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/1
+ no ip address
+ duplex auto
+ speed auto
+!
+interface GigabitEthernet0/2
+ no ip address
+ duplex auto
+ speed auto
+!
+interface Serial0/3/0
+ no ip address
+ clock rate 2000000
+ shutdown
+!
+interface Serial0/3/1
+ description WAN-TO-R-ISP
+ ip address 172.16.0.10 255.255.255.252
+ crypto map VPN-MAP
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+router ospf 1
+ router-id 4.4.4.4
+ log-adjacency-changes
+ redistribute static subnets 
+ passive-interface GigabitEthernet0/0
+ network 172.16.0.8 0.0.0.3 area 0
+ network 10.30.200.0 0.0.0.3 area 0
+!
+ip classless
+ip route 10.30.0.0 255.255.0.0 10.30.200.2 
+!
+ip flow-export version 9
+!
+!
+ip access-list extended VPN-HQ
+ permit ip 10.30.0.0 0.0.255.255 10.10.0.0 0.0.255.255
+!
+banner motd ^CAuthorized access only. Activity is monitored.^C
+!
+!
+!
+!
+line con 0
+ password 7 080243401A16091232595C567C
+ logging synchronous
+ login
+!
+line aux 0
+!
+line vty 0 4
+ login local
+ transport input ssh
+line vty 5 15
+ login local
+ transport input ssh
+!
+!
+!
+end
+
+
+R-BR2# 
