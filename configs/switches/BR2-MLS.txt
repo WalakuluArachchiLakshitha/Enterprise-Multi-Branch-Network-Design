@@ -1,0 +1,170 @@
+BR2-MLS>en
+Password: 
+Password: 
+BR2-MLS#sh run
+Building configuration...
+
+Current configuration : 2362 bytes
+!
+version 12.2(37)SE1
+no service timestamps log datetime msec
+no service timestamps debug datetime msec
+service password-encryption
+!
+hostname BR2-MLS
+!
+!
+no profinet
+enable secret 5 $1$mERr$UD1uvekWLZuJYbrk3Hord0
+!
+!
+!
+!
+!
+ip routing
+!
+!
+!
+!
+username admin secret 5 $1$mERr$UD1uvekWLZuJYbrk3Hord0
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+ip ssh version 2
+no ip domain-lookup
+ip domain-name corp.com
+!
+!
+spanning-tree mode rapid-pvst
+spanning-tree vlan 210,220,298-299 priority 4096
+!
+!
+!
+!
+!
+!
+interface FastEthernet0/1
+ description To-ASA-BR2-Inside
+ switchport access vlan 298
+ switchport mode access
+!
+interface FastEthernet0/2
+ switchport trunk allowed vlan 210,220,298-299,999
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface FastEthernet0/3
+ switchport trunk allowed vlan 210,220,298-299,999
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface FastEthernet0/4
+!
+interface FastEthernet0/5
+!
+interface FastEthernet0/6
+!
+interface FastEthernet0/7
+!
+interface FastEthernet0/8
+!
+interface FastEthernet0/9
+!
+interface FastEthernet0/10
+!
+interface FastEthernet0/11
+!
+interface FastEthernet0/12
+!
+interface FastEthernet0/13
+!
+interface FastEthernet0/14
+!
+interface FastEthernet0/15
+!
+interface FastEthernet0/16
+!
+interface FastEthernet0/17
+!
+interface FastEthernet0/18
+!
+interface FastEthernet0/19
+!
+interface FastEthernet0/20
+!
+interface FastEthernet0/21
+!
+interface FastEthernet0/22
+!
+interface FastEthernet0/23
+!
+interface FastEthernet0/24
+!
+interface GigabitEthernet0/1
+!
+interface GigabitEthernet0/2
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan210
+ mac-address 0001.966c.9401
+ ip address 10.30.10.1 255.255.255.0
+ ip helper-address 10.10.60.10
+!
+interface Vlan220
+ mac-address 0001.966c.9402
+ ip address 10.30.20.1 255.255.255.0
+ ip helper-address 10.10.60.10
+!
+interface Vlan298
+ description Transit-to-ASA
+ mac-address 0001.966c.9403
+ ip address 10.30.198.2 255.255.255.252
+!
+interface Vlan299
+ mac-address 0001.966c.9404
+ ip address 10.30.99.1 255.255.255.0
+!
+ip classless
+ip route 0.0.0.0 0.0.0.0 10.30.198.1 
+!
+ip flow-export version 9
+!
+!
+!
+banner motd ^CAuthorized access only. Activity is monitored.^C
+!
+!
+!
+!
+!
+line con 0
+ password 7 080243401A16091232595C567C
+ logging synchronous
+ login
+!
+line aux 0
+!
+line vty 0 4
+ login local
+ transport input ssh
+line vty 5 15
+ login local
+ transport input ssh
+!
+!
+!
+!
+end
+
+
+BR2-MLS# 
